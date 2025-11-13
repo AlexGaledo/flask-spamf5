@@ -70,11 +70,11 @@ Return only a valid JSON object with the following keys:
     {
       "month": string,
       "kwh_consumed": number,
-      "token_reward": number
+      "Token_earned": number   // tokens earned that month based on savingsd
     }
   ]
 }
-`
+
 
 Instructions:
 
