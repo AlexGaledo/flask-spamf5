@@ -69,11 +69,12 @@ Return only a valid JSON object with the following keys:
   "history": [                               
     {
       "month": string,
-      "kwh_consumed": number
+      "kwh_consumed": number,
+      "token_reward": number
     }
   ]
 }
-
+`
 
 Instructions:
 
