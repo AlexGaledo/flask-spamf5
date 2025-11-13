@@ -42,12 +42,12 @@ reward_index_multiplier = {
    wet: 1  
 }
 
-Compute the user’s adjusted energy baseline using the rolling previously detected average of past consumption, 
-multiplied by a seasonal factor (Sm: 0.9 for cool/rainy, 1.0–1.1 for transition, 1.2 for hot/dry).  
+Compute the user’s adjusted energy baseline using the rolling previously detected average of past consumptions, 
 Recalibrate the baseline if the user saves ≥30% for 3 consecutive months, 
 using the average of those 3 months × Sm, capped at ±20% monthly change. 
 Only count energy savings ≥5% below the adjusted baseline as valid. Output the adjusted baseline (kWh), 
-applied season factor, and a recalibration flag (true if triggered), each kWh saved is equivalent to 0.2 Token.
+applied season factor, and a recalibration flag (true if triggered).
+Each kWh saved is equivalent to 0.2 Token & multiplied by a seasonal factor (get the multipliers from reward_index_multiplier).  
 
 
 
@@ -63,6 +63,7 @@ Return only a valid JSON object with the following keys:
   "current_season": string,                 // e.g., "Wet", "Dry" (refer to the season_index)
   "message": string,                        // concise analysis including how the baseline was derived + energy-saving advice
   "Environmental_Impact": number,           // Equiv GHG Emissions in tons CO2
+  "suggestion": string,                       // personalized energy-saving suggestion
   "To_Offset_Emissions": number,            // trees needed to offset emissions
   "history": [                               
     {
