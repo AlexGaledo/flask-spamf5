@@ -63,7 +63,7 @@ Return only a valid JSON object with the following keys:
   "current_season": string,                 // e.g., "Wet", "Dry" (refer to the season_index)
   "message": string,                        // concise analysis including how the baseline was derived + energy-saving advice
   "Environmental_Impact": number,           // Equiv GHG Emissions in tons CO2
-  "suggestion": string,                       // personalized energy-saving suggestion
+  "suggestions": string,                       // personalized energy-saving suggestion
   "To_Offset_Emissions": number,            // trees needed to offset emissions
   "saved_Percentage": number,              // percentage of energy saved this month
   "history": [                               
