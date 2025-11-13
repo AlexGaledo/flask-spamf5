@@ -3,24 +3,26 @@ from google.genai import types
 from dotenv import load_dotenv
 import os
 
+client = genai.Client()
 class ChatConfig():
     def __init__(self):
         load_dotenv()
         self.client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
-        self.chat = self.client.chats.create(model='gemini-2.5-flash-lite',
-                               config=types.GenerateContentConfig(
-                                    system_instruction=[
-                                        "You are a helpful assistant that helps people find information."
-                                        ]
-                                    ),
-                                )
 
 chat_service = ChatConfig()
 
 def get_chatbot_response(data):
-    # generate a chat instance from each request
-    response = chat_service.chat.send_message(message=data)
-
+    # Create a fresh chat instance for each request to avoid session buildup
+    chat = chat_service.client.chats.create(
+        model='gemini-2.5-flash-lite',
+        config=types.GenerateContentConfig(
+            system_instruction=[
+                "You are a helpful assistant that helps people find information."
+            ]
+        ),
+    )
+    response = chat.send_message(message=data)
+    
     # Return the content of the chatbot message
     return response.text  
 
@@ -112,8 +114,8 @@ def extract_text_from_image(image):
         img_byte_arr.seek(0)
         
         # Use Gemini to extract text from image
-        response = chat_service.client.models.generate_content(
-            model='gemini-2.0-flash-lite',
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
             contents=[
                 types.Part.from_bytes(
                     data=img_byte_arr.read(),
