@@ -4,9 +4,7 @@
 from flask import jsonify, Blueprint, request
 from ..utils.gemini import get_chatbot_response, extract_text_from_image
 from PIL import Image
-import io
-import json
-import re
+
 
 bot_bp = Blueprint('bot_bp', __name__)
 
@@ -39,9 +37,9 @@ def extract():
         img = Image.open(file.stream)
         
         # Extract text using Gemini Vision
-        extracted_text = extract_text_from_image(img)
+        result = extract_text_from_image(img)
         
-        return jsonify({"extracted_text": extracted_text})
+        return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
