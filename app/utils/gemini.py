@@ -34,14 +34,6 @@ Analyze the past billing results detected from the provided bill image or data.
 
 Establish a baseline for energy consumption by:
 
-Calculating the average kWh usage from previous months.
-
-Adjusting that average based on external contextual factors such as weather conditions, temperature, holidays, occupancy changes, or local events that typically influence energy use.
-
-Optionally perform a conceptual search or reasoning step to infer how similar external factors (like seasonal heat or cold) may impact electricity demand in the current month.
-
-Use this reasoning to explain how the baseline was derived.
-
 season_index = {
     Wet: June – November
     Dry: December – May
@@ -49,25 +41,37 @@ season_index = {
 
 reward_index_multiplier = {
    dry: 1.2,
-   wet: 1
-   
+   wet: 1  
 }
+
+Compute the user’s adjusted energy baseline using the rolling 12-month average of past consumption, 
+multiplied by a seasonal factor (Sm: 0.9 for cool/rainy, 1.0–1.1 for transition, 1.2 for hot/dry).  
+Recalibrate the baseline if the user saves ≥30% for 3 consecutive months, 
+using the average of those 3 months × Sm, capped at ±20% monthly change. 
+Only count energy savings ≥5% below the adjusted baseline as valid. Output the adjusted baseline (kWh), 
+applied season factor, and a recalibration flag (true if triggered), each kWh saved is equivalent to 0.2 Token.
+
+
 
 Return only a valid JSON object with the following keys:
 
 { 
-  "baseline": number,                       // estimated baseline consumption based on historical + contextual data
-  "current_usage": number,                  // current month’s usage in kWh
+  "baseline": number,                      
   "energy_saved": number,                   // baseline - current_usage
   "month": string,                          // current billing month
   "current_season": string,                  // e.g., "Winter", "Summer"(refer to the season_index)
   "rate_this_month": number,                // electricity rate (per kWh)
   "actual_consumption": number,             // total consumption in kWh
   "message": string                         // concise analysis including how the baseline was derived + energy-saving advice
-  "Environmental_Impact":                   // Equiv GHG Emissions
-  "To_Offset_Emissions: number               // trees needed to offset emissions
-  "Token_reward": number                     // tokens rewarded based on energy saved
-  "history": {month, billAmount, tokensEarned, status}  //(obtain previous 3 month data )
+  "Environmental_Impact": number,            // Equiv GHG Emissions in tons CO2
+  "To_Offset_Emissions": number,             // trees needed to offset emissions
+  "Token_reward": number,                    // tokens rewarded based on energy saved (energy_saved * reward_index_multiplier)
+  "history": array [                               
+    {// Extract if visible in bill, otherwise return empty array, only get this 2 info for the historical data
+      "month": string,
+      "kwh_consumed": number,(the consumed kWh for that month is the numbers below the chart in the bill provided)
+    }
+  ]
 }
 
 
