@@ -55,12 +55,11 @@ Return only a valid JSON object with the following keys:
 
 { 
   "baseline": number,                       // adjusted energy baseline
-  "currentUsage": number,                   // consumption for the current billing cycle (same as actual_consumption)
+  "currentUsage": number,                   // consumption for the current billing cycle
   "energySaved": number,                    // baseline - currentUsage
-  "sinagTokens": number,                    // total tokens rewarded based on energy saved (energy_saved * reward_index_multiplier)
+  "sinagTokens": number,                    // total tokens rewarded based on energy saved
   "rate": number,                           // electricity rate (per kWh)
   "month": string,                          // current billing month
-  "currentUsage": number,                   // consumption for the current billing cycle (same as actual_consumption)
   "current_season": string,                 // e.g., "Wet", "Dry" (refer to the season_index)
   "message": string,                        // concise analysis including how the baseline was derived + energy-saving advice
   "Environmental_Impact": number,           // Equiv GHG Emissions in tons CO2
@@ -68,8 +67,8 @@ Return only a valid JSON object with the following keys:
   "history": [                               
     {
       "month": string,
-      "kWh_consumed": number,                 //  kwh_consumed
-      "tokensEarned": number,               // tokens earned that month based on savings, give estimation based on baseline - current
+      "kWh_consumed": number,               // kwh consumed in that month
+      "tokensEarned": number                // tokens earned that month based on savings
     }
   ]
 }
