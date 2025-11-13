@@ -3,17 +3,13 @@ from google.genai import types
 from dotenv import load_dotenv
 import os
 
-client = genai.Client()
-class ChatConfig():
-    def __init__(self):
-        load_dotenv()
-        self.client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
-
-chat_service = ChatConfig()
+# Load environment variables once at module level
+load_dotenv()
 
 def get_chatbot_response(data):
-    # Create a fresh chat instance for each request to avoid session buildup
-    chat = chat_service.client.chats.create(
+    # Create a fresh client and chat for each request
+    client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
+    chat = client.chats.create(
         model='gemini-2.5-flash-lite',
         config=types.GenerateContentConfig(
             system_instruction=[
@@ -64,6 +60,7 @@ Return only a valid JSON object with the following keys:
   "sinagTokens": number,                    // total tokens rewarded based on energy saved (energy_saved * reward_index_multiplier)
   "rate": number,                           // electricity rate (per kWh)
   "month": string,                          // current billing month
+  "currentUsage": number,                   // consumption for the current billing cycle (same as actual_consumption)
   "current_season": string,                 // e.g., "Wet", "Dry" (refer to the season_index)
   "message": string,                        // concise analysis including how the baseline was derived + energy-saving advice
   "Environmental_Impact": number,           // Equiv GHG Emissions in tons CO2
@@ -71,9 +68,8 @@ Return only a valid JSON object with the following keys:
   "history": [                               
     {
       "month": string,
-      "billAmount": number,                 // calculate as kwh_consumed × rate
-      "tokensEarned": number,               // tokens earned that month based on savings
-      "status": string                      // "paid" if it's a past month, "pending" for current month
+      "kWh_consumed": number,                 //  kwh_consumed
+      "tokensEarned": number,               // tokens earned that month based on savings, give estimation based on baseline - current
     }
   ]
 }
@@ -113,17 +109,21 @@ def extract_text_from_image(image):
         image.save(img_byte_arr, format=image.format or 'PNG')
         img_byte_arr.seek(0)
         
+        # Create a fresh client for each request
+        client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
+        
         # Use Gemini to extract text from image
+        # For vision models, system instruction must be in contents, not config
         response = client.models.generate_content(
             model='gemini-2.0-flash',
             contents=[
+                sysin,  # System instruction as first content
                 types.Part.from_bytes(
                     data=img_byte_arr.read(),
                     mime_type=f"image/{(image.format or 'png').lower()}",
                 ),
             ],
             config=types.GenerateContentConfig(
-                system_instruction=sysin,
                 response_mime_type="application/json"
             )
         )
