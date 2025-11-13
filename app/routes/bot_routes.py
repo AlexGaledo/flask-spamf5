@@ -43,6 +43,16 @@ def extract():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+
+@bot_bp.route('/chatbot_overlay', methods=['POST'])    
+def chatbot_response(prompt):
+    try:
+        response_message = get_chatbot_response(prompt)
+        return jsonify({"response": response_message})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
  
 
     

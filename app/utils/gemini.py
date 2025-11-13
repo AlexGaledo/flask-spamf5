@@ -44,7 +44,7 @@ reward_index_multiplier = {
    wet: 1  
 }
 
-Compute the user’s adjusted energy baseline using the rolling 12-month average of past consumption, 
+Compute the user’s adjusted energy baseline using the rolling previously detected average of past consumption, 
 multiplied by a seasonal factor (Sm: 0.9 for cool/rainy, 1.0–1.1 for transition, 1.2 for hot/dry).  
 Recalibrate the baseline if the user saves ≥30% for 3 consecutive months, 
 using the average of those 3 months × Sm, capped at ±20% monthly change. 
@@ -66,10 +66,10 @@ Return only a valid JSON object with the following keys:
   "Environmental_Impact": number,            // Equiv GHG Emissions in tons CO2
   "To_Offset_Emissions": number,             // trees needed to offset emissions
   "Token_reward": number,                    // tokens rewarded based on energy saved (energy_saved * reward_index_multiplier)
-  "history": array [                               
-    {// Extract if visible in bill, otherwise return empty array, only get this 2 info for the historical data
+  "history": [                               
+    {
       "month": string,
-      "kwh_consumed": number,(the consumed kWh for that month is the numbers below the chart in the bill provided)
+      "kwh_consumed": number
     }
   ]
 }
@@ -77,9 +77,14 @@ Return only a valid JSON object with the following keys:
 
 Instructions:
 
-Clearly explain how the baseline was obtained in the message field (e.g., “Baseline derived from average usage of detected previous months adjusted for warmer weather and longer daytime hours.”).
+1. For the "history" field: ONLY extract month and kwh_consumed from the chart/table visible in the bill image. 
+   DO NOT include any other fields like billAmount, status, or tokensEarned.
+   DO NOT invent or estimate data that is not visible in the image.
+   If historical consumption data is not visible in the bill, return an empty array [].
 
-When estimating contextual effects (like weather or holidays), simulate a short reasoning or search process to make the explanation realistic and informed.
+2. Clearly explain how the baseline was obtained in the message field.
+
+3. When estimating contextual effects (like weather or holidays), simulate a short reasoning process to make the explanation realistic.
 
 Output JSON only, no extra text."""
 
