@@ -1,0 +1,12 @@
+Flask
+Flask-CORS
+Flask-JWT-Extended
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Bcrypt
+Flask-Mail
+python-dotenv
+itsdangerous
+gunicorn
+psycopg2-binary
+google-genai
