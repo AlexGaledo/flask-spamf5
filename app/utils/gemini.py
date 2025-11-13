@@ -52,6 +52,8 @@ Return only a valid JSON object with the following keys:
   "actual_consumption": number,             // total consumption in kWh
   "baseline": number,                       // estimated baseline consumption based on historical + contextual data
   "message": string                         // concise analysis including how the baseline was derived + energy-saving advice
+  "Environmental_Impact":                   // Equiv GHG Emissions
+  "To_Offset_Emissions: number               // trees needed to offset emissions    
 }
 
 
