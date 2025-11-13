@@ -65,6 +65,7 @@ Return only a valid JSON object with the following keys:
   "Environmental_Impact": number,           // Equiv GHG Emissions in tons CO2
   "suggestion": string,                       // personalized energy-saving suggestion
   "To_Offset_Emissions": number,            // trees needed to offset emissions
+  "saved_Percentage": number,              // percentage of energy saved this month
   "history": [                               
     {
       "month": string,
