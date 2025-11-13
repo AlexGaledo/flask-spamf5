@@ -56,21 +56,22 @@ applied season factor, and a recalibration flag (true if triggered), each kWh sa
 Return only a valid JSON object with the following keys:
 
 { 
-  "baseline": number,                      
-  "energy_saved": number,                   // baseline - current_usage
+  "baseline": number,                       // adjusted energy baseline
+  "currentUsage": number,                   // consumption for the current billing cycle (same as actual_consumption)
+  "energySaved": number,                    // baseline - currentUsage
+  "sinagTokens": number,                    // total tokens rewarded based on energy saved (energy_saved * reward_index_multiplier)
+  "rate": number,                           // electricity rate (per kWh)
   "month": string,                          // current billing month
-  "current_season": string,                  // e.g., "Winter", "Summer"(refer to the season_index)
-  "rate_this_month": number,                // electricity rate (per kWh)
-  "actual_consumption": number,             // total consumption in kWh
-  "message": string                         // concise analysis including how the baseline was derived + energy-saving advice
-  "Environmental_Impact": number,            // Equiv GHG Emissions in tons CO2
-  "To_Offset_Emissions": number,             // trees needed to offset emissions
-  "Token_reward": number,                    // tokens rewarded based on energy saved (energy_saved * reward_index_multiplier)
+  "current_season": string,                 // e.g., "Wet", "Dry" (refer to the season_index)
+  "message": string,                        // concise analysis including how the baseline was derived + energy-saving advice
+  "Environmental_Impact": number,           // Equiv GHG Emissions in tons CO2
+  "To_Offset_Emissions": number,            // trees needed to offset emissions
   "history": [                               
     {
       "month": string,
-      "kwh_consumed": number,
-      "Token_earned": number   // tokens earned that month based on savings
+      "billAmount": number,                 // calculate as kwh_consumed × rate
+      "tokensEarned": number,               // tokens earned that month based on savings
+      "status": string                      // "paid" if it's a past month, "pending" for current month
     }
   ]
 }
@@ -78,14 +79,19 @@ Return only a valid JSON object with the following keys:
 
 Instructions:
 
-1. For the "history" field: ONLY extract month and kwh_consumed from the chart/table visible in the bill image. 
-   DO NOT include any other fields like billAmount, status, or tokensEarned.
+1. For the "history" field: Extract month and kWh consumption from the chart/table visible in the bill image.
+   - month: the month name or abbreviation
+   - billAmount: calculate as (kwh_consumed × rate), rounded to 2 decimal places
+   - tokensEarned: calculate tokens earned that month based on savings (use the energy_saved for that month × reward_index_multiplier)
+   - status: set to "paid" for past months shown in the bill
    DO NOT invent or estimate data that is not visible in the image.
    If historical consumption data is not visible in the bill, return an empty array [].
 
 2. Clearly explain how the baseline was obtained in the message field.
 
 3. When estimating contextual effects (like weather or holidays), simulate a short reasoning process to make the explanation realistic.
+
+4. Use camelCase for all JSON keys (e.g., currentUsage, energySaved, sinagTokens, billAmount, tokensEarned).
 
 Output JSON only, no extra text."""
 
@@ -107,7 +113,7 @@ def extract_text_from_image(image):
         
         # Use Gemini to extract text from image
         response = chat_service.client.models.generate_content(
-            model='gemini-2.0-flash',
+            model='gemini-2.0-flash-lite',
             contents=[
                 types.Part.from_bytes(
                     data=img_byte_arr.read(),
